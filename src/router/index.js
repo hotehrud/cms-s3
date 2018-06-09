@@ -19,7 +19,7 @@ export default new Router({
       component: Preview
     },
     {
-      path: "/error",
+      path: "*",
       name: "Error",
       component: Error
     }

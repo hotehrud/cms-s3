@@ -1,6 +1,7 @@
 import createS3 from "@/s3";
+import config from "@/config/s3";
+const BUCKET_NAME = config.BUCKET_NAME;
 let s3;
-let bucket_name = "BUCKET_NAME";
 
 const state = {
   _tree: {},
@@ -56,9 +57,10 @@ const actions = {
   },
   async getTree({ commit }) {
     let lists = [];
-    await s3.getTreeList(
+    await s3.bridge(
+      "getTreeList",
       {
-        Bucket: bucket_name
+        Bucket: BUCKET_NAME
       },
       lists
     );
@@ -71,8 +73,8 @@ const actions = {
       extensions: ext
     };
     commit("setCurrentType", current);
-    let url = await s3.getFileURL({
-      Bucket: bucket_name,
+    let url = await s3.bridge("getFileURL", {
+      Bucket: BUCKET_NAME,
       Key: path
     });
     commit("fileURL", url);

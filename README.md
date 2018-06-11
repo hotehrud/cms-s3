@@ -26,6 +26,7 @@
      ┬ 
      ├ *
      ├ shard-components
+ ├ config    
  ├ mixins
  ├ router
  ├ store
@@ -39,7 +40,8 @@
 
 ## Build Setup
 
-** Need modify "bucket_name" variables in file **
+- Need modify "BUCKET_NAME" variables in src/config/s3.js
+- Need modify new AWS.Credentials(id, secret) in src/s3.js
 
 ``` bash
 # install dependencies

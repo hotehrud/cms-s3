@@ -1,6 +1,7 @@
 import createS3 from "@/s3";
+import config from "@/config/s3";
+const BUCKET_NAME = config.BUCKET_NAME;
 let s3;
-let bucket_name = "BUCKET_NAME";
 
 const state = {
   _blobURL: ""
@@ -22,7 +23,7 @@ const actions = {
   async download({ commit }) {
     s3 = s3 || createS3();
     const data = await s3.getFileBinary({
-      Bucket: bucket_name,
+      Bucket: BUCKET_NAME,
       Key: null
     });
     const blob = new Blob([data.Body], {

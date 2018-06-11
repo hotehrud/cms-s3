@@ -60,11 +60,9 @@ export default {
       switch (kind) {
         case "folder":
           this.createInput(v => {
+            this.$store.dispatch("accessFileLoading");
             this.$store.dispatch("createFolder", {
-              path: path + "/" + v + "/",
-              callback: () => {
-                this.$store.dispatch("getTree");
-              }
+              path: path + "/" + v + "/"
             });
           }, "folder");
           break;
@@ -75,10 +73,7 @@ export default {
               this.$store.dispatch("upload", {
                 file: data,
                 key: path + "/" + v,
-                callback: () => {
-                  this.$store.dispatch("completed");
-                  this.$store.dispatch("getTree");
-                }
+                first: true
               });
             } else {
               alert("Only .inc is supported");
@@ -97,19 +92,11 @@ export default {
           this.$store.dispatch("accessFileLoading");
           if (type === "file") {
             this.$store.dispatch("deleteFile", {
-              path: path,
-              callback: () => {
-                this.$store.dispatch("completed");
-                this.$store.dispatch("getTree");
-              }
+              path: path
             });
           } else {
             this.$store.dispatch("deleteFolder", {
-              path: path,
-              callback: () => {
-                this.$store.dispatch("completed");
-                this.$store.dispatch("getTree");
-              }
+              path: path
             });
           }
           break;
@@ -206,11 +193,7 @@ export default {
         this.$store.dispatch("accessFileLoading");
         this.$store.dispatch("renameFile", {
           old: path,
-          key: path.substr(0, path.lastIndexOf("/") + 1) + rename,
-          callback: () => {
-            this.$store.dispatch("completed");
-            this.$store.dispatch("getTree");
-          }
+          key: path.substr(0, path.lastIndexOf("/") + 1) + rename
         });
       }
 

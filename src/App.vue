@@ -64,7 +64,7 @@ export default {
   async created() {
     this.$store.dispatch("createS3", {
       id: "CLIENT_ID",
-      ps: "CLIENT_SECRET/e82fmLGtNsamS4UU8L"
+      ps: "CLIENT_SECRET"
     });
     await this.$store.dispatch("getTree");
   },

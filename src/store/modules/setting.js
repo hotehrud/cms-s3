@@ -1,6 +1,7 @@
 import createS3 from "@/s3";
+import config from "@/config/s3";
+const BUCKET_NAME = config.BUCKET_NAME;
 let s3;
-let bucket_name = "BUCKET_NAME";
 
 const state = {
   _setting: false,
@@ -51,6 +52,10 @@ const mutations = {
   },
   clearHover(state) {
     state.prevElement.style.backgroundColor = "";
+  },
+  reloadSetting() {
+    rootAction.dispatch("completed");
+    rootAction.dispatch("getTree");
   }
 };
 
@@ -72,55 +77,55 @@ const actions = {
     }
     commit("hideSetting", false);
   },
-  renameFile({ commit }, data) {
+  async renameFile({ commit }, data) {
     let old = data.old;
     let key = data.key;
-    let callback = data.callback;
 
     let params = {
-      Bucket: bucket_name,
-      CopySource: bucket_name + "/" + old,
+      Bucket: BUCKET_NAME,
+      CopySource: BUCKET_NAME + "/" + old,
       Key: key
     };
 
     s3 = s3 || createS3();
-    s3.renameFile(params, callback);
+    await s3.bridge("renameFile", params);
+    commit("reloadSetting");
   },
-  deleteFile({ commit }, data) {
+  async deleteFile({ commit }, data) {
     let key = data.path;
-    let callback = data.callback;
 
     let params = {
-      Bucket: bucket_name,
+      Bucket: BUCKET_NAME,
       Key: key
     };
 
     s3 = s3 || createS3();
-    s3.deleteFile(params, callback);
+    await s3.bridge("deleteFile", params);
+    commit("reloadSetting");
   },
-  deleteFolder({ commit }, data) {
+  async deleteFolder({ commit }, data) {
     let key = data.path;
-    let callback = data.callback;
 
     let params = {
-      Bucket: bucket_name,
+      Bucket: BUCKET_NAME,
       Prefix: key
     };
 
     s3 = s3 || createS3();
-    s3.deleteFolder(params, callback);
+    await s3.bridge("deleteFolder", params);
+    commit("reloadSetting");
   },
-  createFolder({ commit }, data) {
+  async createFolder({ commit }, data) {
     let key = data.path;
-    let callback = data.callback;
 
     let params = {
-      Bucket: bucket_name,
+      Bucket: BUCKET_NAME,
       Key: key
     };
 
     s3 = s3 || createS3();
-    s3.createFolder(params, callback);
+    await s3.bridge("createFolder", params);
+    commit("reloadSetting");
   }
 };
 

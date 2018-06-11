@@ -16,77 +16,94 @@ class S3 {
   constructor(id, secret) {
     AWS.config.update({
       region: "REGION",
-      credentials: new AWS.Credentials("CLIENT_ID", "CLIENT_SECRET")
+      credentials: new AWS.Credentials(id, secret)
     });
     s3 = new AWS.S3();
   }
 
-  async getTreeList(params, lists, end) {
+  async bridge(kind, params, optional) {
+    let result;
+
+    switch (kind) {
+      case "getTreeList":
+        await this.getTreeList(params, optional);
+        break;
+      case "getFileBinary":
+        result = await this.getFileURL(params);
+        break;
+      case "getFileURL":
+        result = await this.getFileURL(params);
+        break;
+      case "renameFile":
+        await this.renameFile(params);
+        break;
+      case "deleteFile":
+        await this.deleteFile(params);
+        break;
+      case "deleteFolder":
+        await this.deleteFolder(params);
+        break;
+      case "createFolder":
+        await this.createFolder(params);
+        break;
+      case "upload":
+        await this.upload(params, optional);
+        break;
+    }
+    return result;
+  }
+
+  async getTreeList(params, lists) {
+    const data = await s3.listObjectsV2(params).promise();
+    const contents = data.Contents;
+    contents.forEach(content => {
+      lists.push(content.Key);
+    });
+
+    if (data.IsTruncated) {
+      let obj = Object.assign({}, params, {
+        ContinuationToken: data.NextContinuationToken
+      });
+      await this.getTreeList(obj, lists, reslove);
+    }
+  }
+
+  renameFile(params) {
     return new Promise(reslove => {
-      s3.listObjectsV2(params, (err, data) => {
+      s3.copyObject(params, async err => {
         if (err) {
           throw err;
-        } else {
-          let contents = data.Contents;
-          contents.forEach(function(content) {
-            lists.push(content.Key);
-          });
-
-          if (data.IsTruncated) {
-            let obj = Object.assign({}, params, {
-              ContinuationToken: data.NextContinuationToken
-            });
-            this.getTreeList(obj, lists, reslove);
-          } else {
-            reslove();
-            if (end) {
-              end();
-            }
-          }
         }
+        let bucket = params.Bucket;
+        let key = params.CopySource;
+
+        await this.deleteFile({
+          Bucket: bucket,
+          Key: key.substr(bucket.length + 1)
+        });
+        reslove();
       });
     });
   }
 
-  renameFile(params, callback) {
-    s3.copyObject(params, err => {
-      if (err) {
-        throw err;
-      }
-      if (typeof callback === "function") {
-        let bucket = params.Bucket;
-        let key = params.CopySource;
-
-        this.deleteFile(
-          {
-            Bucket: bucket,
-            Key: key.substr(bucket.length + 1)
-          },
-          callback
-        );
-      }
-    });
-  }
-
-  deleteFile(params, callback) {
-    s3.deleteObject(params, err => {
-      if (err) {
-        throw err;
-      }
-      if (typeof callback === "function") {
-        callback();
+  deleteFile(params) {
+    return new Promise(reslove => {
+      s3.deleteObject(params, err => {
+        if (err) {
+          throw err;
+        }
         // Except, when display preview page about deleted file
         if (params.Key === store.getters.currentPath) {
           router.push({
             name: "Index"
           });
         }
-        return;
-      }
+        reslove();
+      });
     });
   }
 
-  async deleteFolder(params, callback) {
+  async deleteFolder(params) {
     const listedObjects = await s3.listObjectsV2(params).promise();
 
     if (listedObjects.Contents.length === 0) {
@@ -108,30 +125,24 @@ class S3 {
       let obj = Object.assign({}, params, {
         ContinuationToken: listedObjects.NextContinuationToken
       });
-      await this.deleteFolder(obj, callback);
+      await this.deleteFolder(obj);
     } else {
-      if (typeof callback === "function") {
-        callback();
-        // Except, when display preview page about deleted file
-        if (store.getters.currentPath.indexOf(params.Prefix) > -1) {
-          router.push({
-            name: "Index"
-          });
-        }
-        return;
+      if (store.getters.currentPath.indexOf(params.Prefix) > -1) {
+        router.push({
+          name: "Index"
+        });
       }
     }
   }
 
-  createFolder(params, callback) {
-    s3.putObject(params).send(err => {
-      if (err) {
-        throw err;
-      } else {
-        if (typeof callback === "function") {
-          callback();
+  createFolder(params) {
+    return new Promise(reslove => {
+      s3.putObject(params).send(err => {
+        if (err) {
+          throw err;
         }
-      }
+        reslove();
+      });
     });
   }
 
@@ -158,32 +169,26 @@ class S3 {
     });
   }
 
-  upload(params, callback) {
+  upload(params, refresh) {
     return new Promise(reslove => {
       s3.upload(params)
         .on("httpUploadProgress", evt => {
           store.commit("progress", parseInt((evt.loaded * 100) / evt.total));
         })
-        .send((err, data) => {
+        .send(async (err, data) => {
           if (err) {
             throw err;
-          } else {
-            if (typeof callback === "function") {
-              callback();
-              return;
-            } else {
-              const changeFile = async () => {
-                let key = data.Key;
-                let url = await this.getFileURL({
-                  Bucket: params.Bucket,
-                  Key: key
-                });
-                store.commit("fileURL", url);
-              };
-              changeFile();
-            }
-            reslove();
           }
+
+          if (!refresh) {
+            let key = data.Key;
+            let url = await this.getFileURL({
+              Bucket: "test-vtouch",
+              Key: key
+            });
+            store.commit("fileURL", url);
+          }
+          reslove();
         });
     });
   }

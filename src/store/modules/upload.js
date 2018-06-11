@@ -1,6 +1,7 @@
 import createS3 from "@/s3";
+import config from "@/config/s3";
+const BUCKET_NAME = config.BUCKET_NAME;
 let s3;
-let bucket_name = "BUCKET_NAME";
 
 const state = {
   _file: null
@@ -36,21 +37,24 @@ const actions = {
     }
     commit("setUploadFile", null);
   },
-  async upload({}, data) {
+  async upload({commit}, data) {
     let body = data.file;
     let key = data.key;
     let type = data.file.type;
-    let callback = data.callback;
+    let newFile = data.first;
 
     let params = {
-      Bucket: bucket_name,
+      Bucket: BUCKET_NAME,
       Key: key,
       ContentType: type,
       Body: body
     };
 
     s3 = s3 || createS3();
-    await s3.upload(params, callback);
+    await s3.bridge("upload", params, newFile);
+    if (newFile) {
+      commit("reloadSetting");
+    }
   }
 };
 

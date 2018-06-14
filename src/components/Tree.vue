@@ -122,6 +122,7 @@ export default {
       if (input.files && input.files[0]) {
         const files = input.files;
         const len = files.length;
+        let multi = len !== 1;
 
         this.$store.dispatch("uploadFileLoading");
         for (let i = 0; i < len; i++) {
@@ -131,7 +132,9 @@ export default {
           } else {
             await this.$store.dispatch("upload", {
               file: file,
-              key: this.path + "/" + file.name
+              key: this.path + "/" + file.name,
+              refresh: true,
+              multi: multi
             });
           }
         }

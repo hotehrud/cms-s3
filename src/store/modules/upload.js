@@ -41,7 +41,8 @@ const actions = {
     let body = data.file;
     let key = data.key;
     let type = data.file.type;
-    let newFile = data.first;
+    let refresh = data.refresh;
+    let multi = data.multi || false;
 
     let params = {
       Bucket: BUCKET_NAME,
@@ -51,8 +52,8 @@ const actions = {
     };
 
     s3 = s3 || createS3();
-    await s3.bridge("upload", params, newFile);
-    if (newFile) {
+    await s3.bridge("upload", params, refresh);
+    if (refresh && !multi) {
       commit("reloadSetting");
     }
   }

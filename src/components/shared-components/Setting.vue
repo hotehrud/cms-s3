@@ -73,7 +73,7 @@ export default {
               this.$store.dispatch("upload", {
                 file: data,
                 key: path + "/" + v,
-                first: true
+                refresh: true
               });
             } else {
               alert("Only .inc is supported");

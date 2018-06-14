@@ -1,29 +1,37 @@
 import AWS from "aws-sdk";
+import Authorize from "@/authorize";
 import store from "@/store/";
 import router from "@/router";
 
-let tower;
-let s3;
+let tower = null;
 
-export default function createS3() {
-  if (!s3) {
-    tower = new S3();
+class Tower {
+  constructor(authIntstance) {
+    if (!tower) {
+      tower = this;
+      this.authorize = authIntstance;
+      this.s3 = new AWS.S3();
+    }
+    return tower;
   }
-  return tower;
-}
 
-class S3 {
-  constructor(id, secret) {
-    AWS.config.update({
-      region: "REGION",
-      credentials: new AWS.Credentials(id, secret)
-    });
-    s3 = new AWS.S3();
+  async login(id, ps) {
+    const res = await this.authorize.loginUser(id, ps);
+    return res;
+  }
+
+  logout() {
+    this.authorize.logoutUser();
   }
 
   async bridge(kind, params, optional) {
-    let result;
+    let loginStatus = await this.authorize.authorizeUser();
+    if (!loginStatus) {
+      window.location.href = "/login";
+      return;
+    }
 
+    let result;
     switch (kind) {
       case "getTreeList":
         await this.getTreeList(params, optional);
@@ -54,7 +62,7 @@ class S3 {
   }
 
   async getTreeList(params, lists) {
-    const data = await s3.listObjectsV2(params).promise();
+    const data = await this.s3.listObjectsV2(params).promise();
     const contents = data.Contents;
     contents.forEach(content => {
       lists.push(content.Key);
@@ -70,7 +78,7 @@ class S3 {
 
   renameFile(params) {
     return new Promise(reslove => {
-      s3.copyObject(params, async err => {
+      this.s3.copyObject(params, async err => {
         if (err) {
           throw err;
         }
@@ -88,7 +96,7 @@ class S3 {
 
   deleteFile(params) {
     return new Promise(reslove => {
-      s3.deleteObject(params, err => {
+      this.s3.deleteObject(params, err => {
         if (err) {
           throw err;
         }
@@ -104,7 +112,7 @@ class S3 {
   }
 
   async deleteFolder(params) {
-    const listedObjects = await s3.listObjectsV2(params).promise();
+    const listedObjects = await this.s3.listObjectsV2(params).promise();
 
     if (listedObjects.Contents.length === 0) {
       return;
@@ -119,7 +127,7 @@ class S3 {
       deleteParams.Delete.Objects.push({ Key });
     });
 
-    await s3.deleteObjects(deleteParams).promise();
+    await this.s3.deleteObjects(deleteParams).promise();
 
     if (listedObjects.IsTruncated) {
       let obj = Object.assign({}, params, {
@@ -137,7 +145,7 @@ class S3 {
 
   createFolder(params) {
     return new Promise(reslove => {
-      s3.putObject(params).send(err => {
+      this.s3.putObject(params).send(err => {
         if (err) {
           throw err;
         }
@@ -149,7 +157,7 @@ class S3 {
   getFileBinary(params) {
     params.Key = store.getters.currentPath;
     return new Promise(reslove => {
-      s3.getObject(params, (err, data) => {
+      this.s3.getObject(params, (err, data) => {
         if (err) {
           throw err;
         }
@@ -160,7 +168,7 @@ class S3 {
 
   getFileURL(params) {
     return new Promise(reslove => {
-      s3.getSignedUrl("getObject", params, (err, url) => {
+      this.s3.getSignedUrl("getObject", params, (err, url) => {
         if (err) {
           throw err;
         }
@@ -171,7 +179,8 @@ class S3 {
 
   upload(params, refresh) {
     return new Promise(reslove => {
-      s3.upload(params)
+      this.s3
+        .upload(params)
         .on("httpUploadProgress", evt => {
           store.commit("progress", parseInt((evt.loaded * 100) / evt.total));
         })
@@ -193,3 +202,5 @@ class S3 {
     });
   }
 }
+
+export default new Tower(new Authorize());

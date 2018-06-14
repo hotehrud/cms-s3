@@ -1,4 +1,4 @@
-import createS3 from "@/s3";
+import s3 from "@/s3";
 import config from "@/config/s3";
 const BUCKET_NAME = config.BUCKET_NAME;
 let s3;
@@ -49,9 +49,6 @@ const mutations = {
   }
 };
 const actions = {
-  createS3({ commit }, info) {
-    s3 = createS3(info.id, info.ps);
-  },
   clearPath({ commit }) {
     commit("setCurrentType");
   },

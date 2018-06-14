@@ -1,4 +1,4 @@
-import createS3 from "@/s3";
+import s3 from "@/s3";
 import config from "@/config/s3";
 const BUCKET_NAME = config.BUCKET_NAME;
 let s3;
@@ -51,7 +51,6 @@ const actions = {
       Body: body
     };
 
-    s3 = s3 || createS3();
     await s3.bridge("upload", params, refresh);
     if (refresh && !multi) {
       commit("reloadSetting");

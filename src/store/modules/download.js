@@ -1,4 +1,4 @@
-import createS3 from "@/s3";
+import s3 from "@/s3";
 import config from "@/config/s3";
 const BUCKET_NAME = config.BUCKET_NAME;
 let s3;
@@ -21,7 +21,6 @@ const mutations = {
 
 const actions = {
   async download({ commit }) {
-    s3 = s3 || createS3();
     const data = await s3.getFileBinary({
       Bucket: BUCKET_NAME,
       Key: null

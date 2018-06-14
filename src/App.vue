@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header-nav/>
-    <section id="sidebar">
+    <section v-if="isSidebar" id="sidebar">
       <tree-view :label="tree.label" :nodes="tree.nodes" :depth="0" :path="tree.path" :type="tree.type" class="tree_container" />
       <div class="loading-area" v-if="isTree">
         <loading-view />
@@ -53,20 +53,20 @@ export default {
         width: "16px",
         height: "16px"
       },
-      isTree: true
+      isTree: true,
+      isSidebar: false
     };
+  },
+  created() {
+    if (this.$route.name !== "Login") {
+      this.isSidebar = true;
+      this.$store.dispatch("getTree");
+    }
   },
   mounted() {
     window.addEventListener("click", () => {
       this.$store.dispatch("closeSetting");
     });
-  },
-  async created() {
-    this.$store.dispatch("createS3", {
-      id: "CLIENT_ID",
-      ps: "CLIENT_SECRET"
-    });
-    await this.$store.dispatch("getTree");
   },
   computed: {
     tree() {
@@ -78,8 +78,13 @@ export default {
   },
   watch: {
     $route(to) {
-      if (to.name === "Index") {
-        this.$store.dispatch("clearPath");
+      if (to.name === "Login") {
+        this.isSidebar = false;
+        return;
+      } else {
+        if (to.name === "Index") {
+          this.$store.dispatch("clearPath");
+        }
       }
     },
     tree() {

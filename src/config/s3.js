@@ -1,3 +1,7 @@
 export default {
-  BUCKET_NAME: ""
+  BUCKET_NAME: "",
+  COGNITO_IDENTITY_POOL_ID: "",
+  COGNITO_USER_POOL_ID: "",
+  COGNITO_CLIENT_ID: "",
+  AWS_REGION: ""
 }

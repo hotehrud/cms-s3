@@ -9,13 +9,14 @@
 - Upload for file
 - Download for file
 - Preview for file(Image, Audio, Video)
+- Authrorize(Cognito)
 
 ## Requirements
 ** Use this app along with the S3 Bucket **
 - [AWS S3](https://aws.amazon.com/s3/)
+- [Coginto](https://aws.amazon.com/cognito) - Optional
 - [aws-sdk for javascript](https://docs.aws.amazon.com/ko_kr/sdk-for-javascript/v2/developer-guide/getting-started-browser.html)
-- [Vue.js](https://github.com/vuejs/vue) 
-- vue-cli 2.x|vuex|vue-router|scss
+- [Vue.js](https://github.com/vuejs/vue) (vue-cli 2.x|vuex|vue-router|scss)
 
 ## Directory Architecture
 
@@ -31,6 +32,7 @@
  ├ router
  ├ store
  ├ views
+ ├ authorize.js
  ├ s3.js
 </pre>
 
@@ -40,8 +42,8 @@
 
 ## Build Setup
 
-- Need modify "BUCKET_NAME" variables in src/config/s3.js
-- Need modify new AWS.Credentials(id, secret) in src/s3.js
+- Need modify variables in src/config/s3.js.
+- Need modify src/authorize.js => ex) coginto.
 
 ``` bash
 # install dependencies

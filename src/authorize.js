@@ -1,7 +1,6 @@
 // Requirement, Auth logic like cognito.
-// ** Example Cognito **
+// ** Example Cognito **import AWS from "aws-sdk";
 
-import AWS from "aws-sdk";
 import {
   CognitoUser,
   CognitoUserPool,
@@ -20,7 +19,7 @@ export default class Authorize {
     const storage = window.localStorage;
     Object.keys(storage).forEach(key => {
       if (key.indexOf("idToken") > -1) {
-        AWS.config.region = "ap-northeast-2";
+        AWS.config.region = AWS_REGION;
         AWS.config.credentials = this.getCognitoIdentityCredentials({
           idToken: storage[key]
         });
@@ -99,6 +98,7 @@ export default class Authorize {
     if (cognitoUser !== null) {
       cognitoUser.signOut();
     }
+    window.location.href = "/login";
   }
 
   getSession() {

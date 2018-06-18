@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <header-nav/>
+    <header-nav :loginStatus="isLogin"/>
     <section v-if="isSidebar" id="sidebar">
       <tree-view :label="tree.label" :nodes="tree.nodes" :depth="0" :path="tree.path" :type="tree.type" class="tree_container" />
       <div class="loading-area" v-if="isTree">
@@ -54,12 +54,14 @@ export default {
         height: "16px"
       },
       isTree: true,
-      isSidebar: false
+      isSidebar: false,
+      isLogin: false
     };
   },
   created() {
     if (this.$route.name !== "Login") {
       this.isSidebar = true;
+      this.isLogin = true;
       this.$store.dispatch("getTree");
     }
   },

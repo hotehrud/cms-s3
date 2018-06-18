@@ -38,7 +38,7 @@
 
 ## Website UI
 
-![alt website UI](src/assets/cms.png)
+![alt website UI](src/assets/cms.gif)
 
 ## Build Setup
 

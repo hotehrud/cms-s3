@@ -29,7 +29,8 @@
             </span>
           </label>
         </div>
-        <div class="btn" @click="login">
+        <p class="text-alert">{{ loginMessage }}</p>
+        <div class="btn-login" @click="login">
           Login
         </div>
       </fieldset>
@@ -39,6 +40,11 @@
 
 <script>
 export default {
+  computed: {
+    loginMessage() {
+      return this.$store.getters.loginMessage;
+    }
+  },
   methods: {
     async login() {
       let id = document.getElementById("authId");
@@ -106,7 +112,12 @@ input[type="password"] {
   }
 }
 
-.btn {
+.text-alert {
+  margin: 5px;
+  color: red;
+}
+
+.btn-login {
   -webkit-appearance: none;
   padding: 7.5px 15px;
   background-color: #000;

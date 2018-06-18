@@ -83,7 +83,7 @@ const actions = {
 
     let params = {
       Bucket: BUCKET_NAME,
-      CopySource: BUCKET_NAME + "/" + old,
+      CopySource: encodeURIComponent(BUCKET_NAME + "/" + old),
       Key: key
     };
 

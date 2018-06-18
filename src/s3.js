@@ -83,7 +83,7 @@ class Tower {
           throw err;
         }
         let bucket = params.Bucket;
-        let key = params.CopySource;
+        let key = decodeURIComponent(params.CopySource);
 
         await this.deleteFile({
           Bucket: bucket,

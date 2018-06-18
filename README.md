@@ -2,6 +2,10 @@
 
 > You can build CMS for S3 bucket.
 
+## Website UI
+
+![alt website UI](src/assets/cms.gif)
+
 ## functions
 - Treeview for lists in S3 Bucket
 - Drag And Drop
@@ -35,10 +39,6 @@
  ├ authorize.js
  ├ s3.js
 </pre>
-
-## Website UI
-
-![alt website UI](src/assets/cms.gif)
 
 ## Build Setup
 

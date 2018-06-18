@@ -1,7 +1,6 @@
 import s3 from "@/s3";
 import config from "@/config/s3";
 const BUCKET_NAME = config.BUCKET_NAME;
-let s3;
 
 const state = {
   _tree: {},

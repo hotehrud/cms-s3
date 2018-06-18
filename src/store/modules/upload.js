@@ -1,7 +1,6 @@
 import s3 from "@/s3";
 import config from "@/config/s3";
 const BUCKET_NAME = config.BUCKET_NAME;
-let s3;
 
 const state = {
   _file: null
@@ -37,7 +36,7 @@ const actions = {
     }
     commit("setUploadFile", null);
   },
-  async upload({commit}, data) {
+  async upload({ commit }, data) {
     let body = data.file;
     let key = data.key;
     let type = data.file.type;

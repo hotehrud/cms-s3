@@ -1,7 +1,7 @@
 <template>
   <div class="preview">
     <div class="before">
-      <img id="beforeImage" :src="imageURL">
+      <img id="beforeFile" :src="fileURL">
     </div>
     <div class="between">
       <div class="arrow">
@@ -9,8 +9,8 @@
       </div>
     </div>
     <div class="after">
-      <drag-and-drop v-show="!isUploadImage" :accept="'image'" />
-      <img v-show="isUploadImage" :src="uploadFile">
+      <drag-and-drop v-show="!isUpload" :accept="'image'" />
+      <img v-show="isUpload" :src="uploadFile">
     </div>
   </div>
 </template>
@@ -29,24 +29,27 @@ export default {
     this.$on("preview-file", this.previewFile);
   },
   mounted() {
-    const img = document.getElementById("beforeImage");
-    img.addEventListener(
-      "load",
-      () => {
-        this.$store.dispatch("completed");
-      },
-      false
-    );
+    this.init();
   },
   computed: {
-    imageURL() {
+    fileURL() {
       return this.$store.getters.filePath;
     },
-    isUploadImage() {
+    isUpload() {
       return this.$store.getters.isUploadFile;
     }
   },
   methods: {
+    init() {
+      const el = document.getElementById("beforeFile");
+      el.addEventListener(
+        "load",
+        () => {
+          this.$store.dispatch("completed");
+        },
+        false
+      );
+    },
     previewFile() {
       this.uploadFile = "";
       const file = this.$store.getters.uploadFile;
@@ -64,37 +67,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.preview {
-  width: 900px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 0 auto;
-  .before {
-    border: 2px solid #ccc;
-  }
-  .before,
-  .after {
-    flex-basis: 40%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .between {
-    flex-basis: 20%;
-    .arrow {
-      margin: 0 auto;
-      width: 80%;
-      height: 100%;
-      border-radius: 0.5rem;
-      color: #fff;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-    }
-  }
-  img {
-    width: 100%;
-  }
+.before {
+  border: 2px solid #ccc;
 }
 </style>

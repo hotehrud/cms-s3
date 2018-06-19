@@ -79,4 +79,35 @@ export default {
 #input_img {
   display: none;
 }
+
+.preview {
+  width: 900px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  .before,
+  .after {
+    flex-basis: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .between {
+    flex-basis: 20%;
+    .arrow {
+      margin: 0 auto;
+      width: 80%;
+      height: 100%;
+      border-radius: 0.5rem;
+      color: #fff;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+  }
+  img {
+    width: 100%;
+  }
+}
 </style>

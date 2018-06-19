@@ -1,9 +1,9 @@
 <template>
   <div class="preview">
     <div class="before">
-      <audio id="beforeAudio" controls>
-        <source :src="audioURL" type="audio/ogg">
-        <source :src="audioURL" type="audio/mpeg"> Your browser does not support the audio tag.
+      <audio id="beforeFile" controls>
+        <source :src="fileURL" type="audio/ogg">
+        <source :src="fileURL" type="audio/mpeg"> Your browser does not support the audio tag.
       </audio>
     </div>
     <div class="between">
@@ -12,8 +12,8 @@
       </div>
     </div>
     <div class="after">
-      <drag-and-drop v-show="!isUploadFile" :accept="'audio'" />
-      <audio v-show="isUploadFile" id="afterAudio" controls controlsList="nodownload">
+      <drag-and-drop v-show="!isUpload" :accept="'audio'" />
+      <audio v-show="isUpload" id="afterFile" controls controlsList="nodownload">
         <source :src="uploadFile" type="audio/ogg">
         <source :src="uploadFile" type="audio/mpeg"> Your browser does not support the audio tag.
       </audio>
@@ -22,44 +22,29 @@
 </template>
 
 <script>
+import Image from "@/components/preview/Image";
+
 export default {
-  data() {
-    return {
-      uploadFile: ""
-    };
-  },
-  created() {
-    this.$on("upload-completed", () => {
-      this.$store.dispatch("resetUploadFile");
-    });
-    this.$on("preview-file", this.previewFile);
-  },
-  mounted() {
-    const audio = document.getElementById("beforeAudio");
-    audio.addEventListener(
-      "loadeddata",
-      () => {
-        this.$store.dispatch("completed");
-      },
-      false
-    );
-  },
-  computed: {
-    audioURL() {
-      return this.$store.getters.filePath;
-    },
-    isUploadFile() {
-      return this.$store.getters.isUploadFile;
-    }
-  },
+  extends: Image,
   methods: {
+    init() {
+      const audio = document.getElementById("beforeFile");
+      audio.addEventListener(
+        "loadeddata",
+        () => {
+          this.$store.dispatch("completed");
+        },
+        false
+      );
+    },
     previewFile() {
       this.uploadFile = "";
       const file = this.$store.getters.uploadFile;
       this.$store.dispatch("accessFileLoading");
 
-      const audio = document.getElementById("afterAudio");
+      const audio = document.getElementById("afterFile");
       this.uploadFile = window.URL.createObjectURL(file);
+      audio.load();
 
       audio.addEventListener(
         "loadeddata",
@@ -68,13 +53,12 @@ export default {
         },
         false
       );
-      audio.load();
     }
   },
   watch: {
-    audioURL() {
-      const before = document.getElementById("beforeAudio");
-      const after = document.getElementById("afterAudio");
+    fileURL() {
+      const before = document.getElementById("beforeFile");
+      const after = document.getElementById("afterFile");
       before.load();
       after.load();
     }
@@ -83,34 +67,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.preview {
-  width: 900px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 0 auto;
-  .before,
-  .after {
-    flex-basis: 40%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .between {
-    flex-basis: 20%;
-    .arrow {
-      margin: 0 auto;
-      width: 80%;
-      height: 100%;
-      border-radius: 0.5rem;
-      color: #fff;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-    }
-  }
-  img {
-    width: 100%;
-  }
-}
 </style>

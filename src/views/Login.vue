@@ -22,7 +22,7 @@
         </div>
         <div class="check">
           <label class="cb">
-            <input type="checkbox" />
+            <input id="remember" type="checkbox" />
             <span class="cb-field"></span>
             <span class="cb-text">
               <span>Remember me</span>
@@ -49,9 +49,11 @@ export default {
     async login() {
       let id = document.getElementById("authId");
       let ps = document.getElementById("authPs");
+      let remember = document.getElementById("remember");
       await this.$store.dispatch("loginUser", {
         id: id.value,
-        ps: ps.value
+        ps: ps.value,
+        keep: remember.checked
       });
     }
   }

@@ -34,9 +34,10 @@ const actions = {
   async loginUser({ commit }, info) {
     let username = info.id;
     let password = info.ps;
+    let keep = info.keep;
     let status = false;
 
-    const response = await s3.login(username, password);
+    const response = await s3.login(username, password, keep);
     response.id = username;
     if (response.code === 400) {
       commit("loginMessage", response.msg);

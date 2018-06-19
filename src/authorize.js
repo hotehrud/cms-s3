@@ -1,6 +1,4 @@
-// Requirement, Auth logic like cognito.
-// ** Example Cognito **import AWS from "aws-sdk";
-
+import AWS from "aws-sdk";
 import {
   CognitoUser,
   CognitoUserPool,
@@ -35,10 +33,11 @@ export default class Authorize {
   }
 
   async authorizeUser() {
-    if (document.cookie.indexOf("auth=ok") < 0) {
+    if (
+      !window.localStorage.getItem("loginKeep") &&
+      document.cookie.indexOf("auth=ok") < 0
+    ) {
       return false;
-    } else {
-      return true;
     }
     let session = await this.getSession();
     return new Promise(reslove => {
@@ -54,7 +53,7 @@ export default class Authorize {
     });
   }
 
-  loginUser(username, password) {
+  loginUser(username, password, keep) {
     return new Promise(reslove => {
       let authData = {
         Username: username,
@@ -78,6 +77,10 @@ export default class Authorize {
           now.setTime(expireTime);
           document.cookie = "auth=ok;expires=" + now.toGMTString() + ";path=/";
 
+          if (keep) {
+            window.localStorage.setItem("loginKeep", true);
+          }
+
           window.location.href = "/";
         },
         onFailure: err => {
@@ -95,6 +98,8 @@ export default class Authorize {
     let cognitoUser = this.userPool.getCurrentUser();
     document.cookie =
       "auth=ok;expires=" + "Thu, 01 Jan 1970 00:00:01 GMT" + ";path=/";
+    window.localStorage.removeItem("loginKeep");
+
     if (cognitoUser !== null) {
       cognitoUser.signOut();
     }

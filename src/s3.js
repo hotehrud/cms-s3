@@ -15,8 +15,8 @@ class Tower {
     return tower;
   }
 
-  async login(id, ps) {
-    const res = await this.authorize.loginUser(id, ps);
+  async login(id, ps, keep) {
+    const res = await this.authorize.loginUser(id, ps, keep);
     return res;
   }
 

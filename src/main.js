@@ -13,10 +13,24 @@ Vue.config.productionTip = false;
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  if (requiresAuth && document.cookie.indexOf("auth=ok") < 0) {
-    next("/login");
+  if (requiresAuth) {
+    if (
+      window.localStorage.getItem("loginKeep") ||
+      document.cookie.indexOf("auth=ok") > -1
+    ) {
+      next();
+    } else {
+      next("/login");
+    }
   } else {
-    next();
+    if (
+      window.localStorage.getItem("loginKeep") ||
+      document.cookie.indexOf("auth=ok") > -1
+    ) {
+      next("/");
+    } else {
+      next();
+    }
   }
 });
 

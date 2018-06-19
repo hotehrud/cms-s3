@@ -20,13 +20,7 @@ export default new Router({
     {
       path: "/login",
       name: "Login",
-      component: Login,
-      beforeEnter(to, from, next) {
-        if (document.cookie.indexOf("auth=ok") > -1) {
-          next("/");
-        }
-        next();
-      }
+      component: Login
     },
     {
       path: "/preview",

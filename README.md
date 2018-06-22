@@ -40,6 +40,9 @@
  ├ s3.js
 </pre>
 
+## Broswer support
+- Chrome
+
 ## Build Setup
 
 - Need modify variables in src/config/s3.js.

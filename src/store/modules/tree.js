@@ -1,6 +1,7 @@
 import s3 from "@/s3";
 import config from "@/config/s3";
 const BUCKET_NAME = config.BUCKET_NAME;
+const RESOURCE_DIR = config.RESOURCE_DIR;
 
 const state = {
   _tree: {},
@@ -82,7 +83,6 @@ function listAllKeys(lists) {
 
   lists.forEach(p => {
     let part = p.split("/");
-
     let pointer = refine;
     part.forEach((w, idx) => {
       if (idx === part.length - 1) {
@@ -134,7 +134,15 @@ function listAllKeys(lists) {
     }
     return array;
   }
-  return objectToObj(refine)[0];
+
+  const array = objectToObj(refine);
+
+  for (let idx in array) {
+    let item = array[idx];
+    if (item.label === RESOURCE_DIR && item.type === "folder") {
+      return item;
+    }
+  }
 }
 
 export default {

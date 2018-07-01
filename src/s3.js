@@ -9,8 +9,8 @@ class Tower {
   constructor(authIntstance) {
     if (!tower) {
       tower = this;
+      this.s3 = null;
       this.authorize = authIntstance;
-      this.s3 = new AWS.S3();
     }
     return tower;
   }
@@ -25,10 +25,18 @@ class Tower {
   }
 
   async bridge(kind, params, optional) {
-    let loginStatus = await this.authorize.authorizeUser();
-    if (!loginStatus) {
-      window.location.href = "/login";
-      return;
+    if (this.authorize.keep) {
+      await this.authorize.keepLogin();
+    } else {
+      let loginStatus = await this.authorize.authorizeUser();
+      if (!loginStatus) {
+        window.location.href = "/login";
+        return;
+      }
+    }
+
+    if (!this.s3) {
+      this.s3 = new AWS.S3();
     }
 
     let result;

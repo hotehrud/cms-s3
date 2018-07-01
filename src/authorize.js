@@ -13,23 +13,41 @@ const AWS_REGION = config.AWS_REGION;
 
 export default class Authorize {
   constructor() {
-    // Get, current User from localStorage
-    const storage = window.localStorage;
-    Object.keys(storage).forEach(key => {
-      if (key.indexOf("idToken") > -1) {
-        AWS.config.region = AWS_REGION;
-        AWS.config.credentials = this.getCognitoIdentityCredentials({
-          idToken: storage[key]
-        });
-      }
-    });
+    if (window.localStorage.getItem("loginKeep")) {
+      this.keep = true;
+    }
 
+    AWS.config.region = AWS_REGION;
     this.session = {};
     this.poolData = {
       UserPoolId: COGNITO_USER_POOL_ID,
       ClientId: COGNITO_CLIENT_ID
     };
     this.userPool = new CognitoUserPool(this.poolData);
+  }
+
+  keepLogin() {
+    return new Promise(reslove => {
+      const storage = window.localStorage;
+      Object.keys(storage).forEach(key => {
+        if (key.indexOf("idToken") > -1) {
+          AWS.config.credentials = this.getCognitoIdentityCredentials({
+            idToken: storage[key]
+          });
+          AWS.config.credentials.get(async err => {
+            if (err) {
+              // console.log(err);
+              // console.log(AWS.config.credentials);
+            }
+
+            if (AWS.config.credentials.expired) {
+              await this.authorizeUser();
+            }
+            reslove(true);
+          });
+        }
+      });
+    });
   }
 
   async authorizeUser() {
@@ -44,11 +62,19 @@ export default class Authorize {
       if (!session) {
         reslove(false);
       }
-      const tokens = this.session.user.signInUserSession;
+      const tokens = this.session.user;
 
       AWS.config.credentials = this.getCognitoIdentityCredentials(tokens);
       AWS.config.credentials.get(err => {
-        reslove(true);
+        if (err) {
+          // console.log(err);
+        }
+
+        if (AWS.config.credentials.expired) {
+          reslove(false);
+        } else {
+          reslove(true);
+        }
       });
     });
   }
@@ -84,7 +110,7 @@ export default class Authorize {
           window.location.href = "/";
         },
         onFailure: err => {
-          console.log(err);
+          // console.log(err);
           reslove({
             code: 400,
             msg: err.message
@@ -109,13 +135,14 @@ export default class Authorize {
   getSession() {
     return new Promise(reslove => {
       let cognitoUser = this.userPool.getCurrentUser();
-      if (cognitoUser !== null) {
+      if (window.localStorage.getItem("loginKeep") || cognitoUser !== null) {
         cognitoUser.getSession((err, session) => {
           if (err) {
-            console.log(err);
             this.logoutUser();
           }
-          this.session.user = cognitoUser;
+          this.session.user = {
+            idToken: session.idToken.jwtToken
+          };
           reslove(true);
         });
       } else {

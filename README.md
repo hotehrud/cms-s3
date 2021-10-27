@@ -18,7 +18,7 @@
 ## Requirements
 ** Use this app along with the S3 Bucket **
 - [AWS S3](https://aws.amazon.com/s3/)
-- [Coginto](https://aws.amazon.com/cognito) - Optional
+- [Cognito](https://aws.amazon.com/cognito) - Optional
 - [aws-sdk for javascript](https://docs.aws.amazon.com/ko_kr/sdk-for-javascript/v2/developer-guide/getting-started-browser.html)
 - [Vue.js](https://github.com/vuejs/vue) (vue-cli 2.x|vuex|vue-router|scss)
 

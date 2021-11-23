@@ -1,8 +1,7 @@
 export default {
   BUCKET_NAME: "",
-  COGNITO_IDENTITY_POOL_ID: "",
-  COGNITO_USER_POOL_ID: "",
-  COGNITO_CLIENT_ID: "",
   AWS_REGION: "",
-  RESOURCE_DIR: ""
+  ACCESS_KEY_ID: "",
+  SECRET_ACCESS_KEY: "",
+  RESOURCE_DIR: "assets"
 }

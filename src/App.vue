@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <header-nav :loginStatus="isLogin"/>
+    <header-nav />
     <section v-if="isSidebar" id="sidebar">
       <tree-view :label="tree.label" :nodes="tree.nodes" :depth="0" :path="tree.path" :type="tree.type" class="tree_container" />
       <div class="loading-area" v-if="isTree">
@@ -54,16 +54,12 @@ export default {
         height: "16px"
       },
       isTree: true,
-      isSidebar: false,
-      isLogin: false
+      isSidebar: false
     };
   },
   created() {
-    if (this.$route.name !== "Login") {
-      this.isSidebar = true;
-      this.isLogin = true;
-      this.$store.dispatch("getTree");
-    }
+    this.isSidebar = true;
+    this.$store.dispatch("getTree");
   },
   mounted() {
     window.addEventListener("click", () => {
@@ -80,13 +76,8 @@ export default {
   },
   watch: {
     $route(to) {
-      if (to.name === "Login") {
-        this.isSidebar = false;
-        return;
-      } else {
-        if (to.name === "Index") {
-          this.$store.dispatch("clearPath");
-        }
+      if (to.name === "Index") {
+        this.$store.dispatch("clearPath");
       }
     },
     tree() {

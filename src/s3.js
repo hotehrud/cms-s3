@@ -1,40 +1,30 @@
 import AWS from "aws-sdk";
-import Authorize from "@/authorize";
 import store from "@/store/";
 import router from "@/router";
+import config from "@/config/s3";
+const ACCESS_KEY_ID = config.ACCESS_KEY_ID;
+const SECRET_ACCESS_KEY = config.SECRET_ACCESS_KEY;
+const BUCKET_NAME = config.BUCKET_NAME;
+const AWS_REGION = config.AWS_REGION;
+
+AWS.config.update({
+  accessKeyId: ACCESS_KEY_ID,
+  secretAccessKey: SECRET_ACCESS_KEY,
+  region: AWS_REGION
+})
 
 let tower = null;
 
 class Tower {
-  constructor(authIntstance) {
+  constructor() {
     if (!tower) {
       tower = this;
       this.s3 = null;
-      this.authorize = authIntstance;
     }
     return tower;
   }
 
-  async login(id, ps, keep) {
-    const res = await this.authorize.loginUser(id, ps, keep);
-    return res;
-  }
-
-  logout() {
-    this.authorize.logoutUser();
-  }
-
   async bridge(kind, params, optional) {
-    if (this.authorize.keep) {
-      await this.authorize.keepLogin();
-    } else {
-      let loginStatus = await this.authorize.authorizeUser();
-      if (!loginStatus) {
-        window.location.href = "/login";
-        return;
-      }
-    }
-
     if (!this.s3) {
       this.s3 = new AWS.S3();
     }
@@ -200,7 +190,7 @@ class Tower {
           if (!refresh) {
             let key = data.Key;
             let url = await this.getFileURL({
-              Bucket: "test-vtouch",
+              Bucket: BUCKET_NAME,
               Key: key
             });
             store.commit("fileURL", url);
@@ -211,4 +201,4 @@ class Tower {
   }
 }
 
-export default new Tower(new Authorize());
+export default new Tower();

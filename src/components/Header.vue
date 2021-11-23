@@ -1,22 +1,14 @@
 <template>
   <nav>
     <h1>Vue.js + S3, CMS</h1>
-    <div v-if="loginStatus" class="btn-logout" @click="logout">Logout</div>
   </nav>
 </template>
 
 <script>
 export default {
   props: {
-    loginStatus: {
-      type: Boolean,
-      value: false
-    }
   },
   methods: {
-    logout() {
-      this.$store.dispatch("logoutUser");
-    }
   }
 };
 </script>
